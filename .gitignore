@@ -1,8 +1,8 @@
 # Ignore beta folder (old code versions)
 beta/
 
-# Ignore Data folder (big files)
-Data/
+# Ignore big files (fits)
+*.fits
 
 # Ingnore Papers folder
 Papers/
