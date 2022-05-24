@@ -4,6 +4,9 @@ beta/
 # Ignore Data folder (big files)
 Data/
 
+# Ingnore Papers folder
+Papers/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
