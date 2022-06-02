@@ -1,18 +1,39 @@
-import numpy as np 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import os
-import pandas as pd
-from typing import List
+import astropy
+import numpy as np
+import matplotlib as mpl
+from astropy.io import fits
+import matplotlib.pyplot as plt
+from typing import Tuple
 
 
-def latex_settings(nrows=1, ncols=1, height_factor=1.):
+fits_type = astropy.io.fits.hdu.hdulist.HDUList
+def get_fits_file(wavelen: str, fits_path: str) -> Tuple[fits_type,
+                                                         np.ndarray]:
+    """Get the fits obj and the corresponding image. 
+
+    Args:
+        wavelen (str): wavelength relative to the fits,
+                       can be ['F606w', 'F814w'];
+        fits_path (str): path to the fits's directory;
+
+    Returns:
+        Tuple[fits_type, np.ndarray]: fits obj and image.
+    """
+    files = os.listdir(fits_path)
+    file = [file for file in files if file.split('_')[-3] == wavelen][0]
+    fits_obj = fits.open(fits_path + file)
+    image = fits_obj[0].data
+    return fits_obj, image
+
+
+def latex_settings(nrows=1, ncols=1, height=1., ):
     fig, ax = plt.subplots(nrows, ncols, constrained_layout=True)  
     fig_width_pt = 390.0    # Get this from LaTeX using \the\columnwidth
-    inches_per_pt = 1.0 / 72.27                            # Convert pt to inches
-    golden_mean = (np.sqrt(5) - 1.0) / 2.0                 # Aesthetic ratio
-    fig_width = fig_width_pt * inches_per_pt               # width in inches
-    fig_height = fig_width * golden_mean * height_factor   # height in inches
+    inches_per_pt = 1.0 / 72.27                          # Convert pt to inches
+    golden_mean = (np.sqrt(5) - 1.0) / 2.0               # Aesthetic ratio
+    fig_width = fig_width_pt * inches_per_pt             #  width in inches
+    fig_height = fig_width * golden_mean * height # height in inches
     fig_size = [fig_width, fig_height]
     params = {'backend': 'ps',
               'axes.labelsize': 14,
@@ -23,37 +44,14 @@ def latex_settings(nrows=1, ncols=1, height_factor=1.):
               'axes.axisbelow': True}
 
     mpl.rcParams.update(params)
-    return ax
+    return fig, ax
 
 
 def fancy_legend(leg):
     for lh in leg.legendHandles: 
         lh.set_alpha(1)
         lh.set_linewidth(1)
-
-
-def plot_data(df: pd.DataFrame, file: str, lw: float, title: str = None,
-              peaks: np.ndarray = None, feature: str = 'Load') -> None:
-    ax = latex_settings()
-    ax.plot(df['Date'], df[feature], 'b', lw=lw)
-    
-    if isinstance(peaks, np.ndarray):    
-        ax.plot(df['Date'][peaks], df[feature][peaks], 'rx')
-    
-    ax.grid()
-    ax.set_xlabel('Date')
-    ax.set_ylabel(f'{feature} (MWh)')
-    ax.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
-    plt.title(title)
-    
-    filepath = '../Images/'
-    if os.path.isfile(filepath + file):
-        pass
-    else:    
-        plt.savefig(f'{filepath}{file}.png', dpi=800, transparent=True)
-    
-    plt.show()
-    
+   
 
 def latex_table_generator(df, filepath, float_format=None):
     n_cols = len(df.columns)
@@ -68,22 +66,3 @@ def latex_table_generator(df, filepath, float_format=None):
                 escape=False
                 )
         )
-
-
-def int_from_str(string: str) -> int:
-    """Exctract an integer number from a string.
-    Args:
-        string (str): string containing a number.
-    Returns:
-        int: integer number inside the string.
-    """
-    num = int(''.join(filter(str.isdigit, string)))
-    return num
-
-
-def get_result_filenames(results_path: str, freq: str) -> List[str]:
-    all_files = os.listdir(results_path)
-    files = [file for file in all_files if file.split('_')[1] == freq]
-
-    files.sort(key=int_from_str, reverse=False)
-    return files
