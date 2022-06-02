@@ -4,6 +4,9 @@ beta/
 # Ignore big files (fits)
 *.fits
 
+# Ignore npy files
+*.npy
+
 # Ingnore Papers folder
 Papers/
 
