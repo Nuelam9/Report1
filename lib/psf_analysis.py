@@ -6,11 +6,11 @@ def get_OTF_from_PSF(PSF: np.ndarray, bb: int = 15) -> np.ndarray:
        Pupil Function (or PSF).
 
     Args:
-        PSF (np.ndarray): Pupil Function,
+        PSF (np.ndarray): theoretical Pupil Function computed bitwise,
         bb (int, optional): half side of the squared box used to resize
                             the PSF. Defaults to 15.
 
-    Returns:
+    Returns: 
         np.ndarray: OTF shifted in the origin.
     """
     xc, yc = np.where(PSF==PSF.max())
