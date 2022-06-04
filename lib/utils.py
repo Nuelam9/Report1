@@ -27,13 +27,13 @@ def get_fits_file(wavelen: str, fits_path: str) -> Tuple[fits_type,
     return fits_obj, image
 
 
-def latex_settings(nrows=1, ncols=1, height=1., ):
+def latex_settings(nrows=1, ncols=1, height=1., length=1.):
     fig, ax = plt.subplots(nrows, ncols, constrained_layout=True)  
     fig_width_pt = 390.0    # Get this from LaTeX using \the\columnwidth
     inches_per_pt = 1.0 / 72.27                          # Convert pt to inches
     golden_mean = (np.sqrt(5) - 1.0) / 2.0               # Aesthetic ratio
-    fig_width = fig_width_pt * inches_per_pt             #  width in inches
-    fig_height = fig_width * golden_mean * height # height in inches
+    fig_width = fig_width_pt * inches_per_pt * length    #  width in inches
+    fig_height = fig_width * golden_mean * height        # height in inches
     fig_size = [fig_width, fig_height]
     params = {'backend': 'ps',
               'axes.labelsize': 14,
@@ -53,16 +53,27 @@ def fancy_legend(leg):
         lh.set_linewidth(1)
    
 
-def latex_table_generator(df, filepath, float_format=None):
+def latex_table_generator(df, filepath, float_format=None, index=False):
     n_cols = len(df.columns)
     latex_cols = [r'\textbf{%s}' %col for col in df.columns]
     with open(filepath, 'w') as tf:
         tf.write(
             df.to_latex(
-                index=False,
+                index=index,
                 float_format=float_format,
-                column_format='c'*n_cols,
+                column_format='c' * (n_cols + 1 * index),
                 header=latex_cols,
                 escape=False
                 )
         )
+        
+
+def r_squared(y_true, y_pred):
+    correlation_matrix = np.corrcoef(y_true, y_pred)
+    correlation_xy = correlation_matrix[0,1]
+    return correlation_xy ** 2
+
+
+def Gaussian1D(x, A, mu, var):
+    factor = A / np.sqrt(2. * np.pi * var)
+    return factor * np.exp(- 0.5 * (x - mu) ** 2. / var)
