@@ -4,25 +4,24 @@ import matplotlib.pyplot as plt
 from utils import latex_settings
 
 
+def find_coords_from_image(inf: int, sup: int, image: np.ndarray) -> np.ndarray:
+    """Find all the pixel coordinates which have values in a given range.
+
+    Args:
+        inf (int): lower bound for image values;
+        sup (int): upper bound for image values;
+        image (np.ndarray): image choosen to be investigated.
+
+    Returns:
+        np.ndarray: coordinates of the wanted pixel values.
+    """
+    idys, idxs = np.where((image > inf) & (image < sup))
+    ids = np.array((idxs, idys)).T
+    return ids
+    
+
 try:
     from graph_tool.all import *
-    
-    def find_coords_from_image(inf: int, sup: int, image: np.ndarray) -> np.ndarray:
-        """Find all the pixel coordinates which have values in a given range.
-
-        Args:
-            inf (int): lower bound for image values;
-            sup (int): upper bound for image values;
-            image (np.ndarray): image choosen to be investigated.
-
-        Returns:
-            np.ndarray: coordinates of the wanted pixel values.
-        """
-        idys, idxs = np.where((image > inf) & (image < sup))
-        ids = np.array((idxs, idys)).T
-        return ids
-
-
     graph_type = graph_tool.Graph
     def geometric_graph_stars(coords: np.ndarray, distance: float) -> graph_type:
         """Create a geometric graph starting from the (X,Y) coordinates,
